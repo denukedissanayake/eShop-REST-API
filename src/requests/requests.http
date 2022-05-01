@@ -1,0 +1,190 @@
+@admin-auth-token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyNTMwYmJiYWMyZTUyZjVlNGRmZTIyZiIsInVzZXJuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTY0OTYwOTg2NSwiZXhwIjoxNjQ5Njk2MjY1fQ.jy2tqJN-pJuLIOPK0ZxEO5ZZsWkIax9wENWzJ-sKT00
+
+@user1-auth-token =Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyNTMwYmVhYWMyZTUyZjVlNGRmZTIzMiIsInVzZXJuYW1lIjoidXNlcjEiLCJlbWFpbCI6InVzZXIxQGdtYWlsLmNvbSIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2NDk2MDk5MzQsImV4cCI6MTY0OTY5NjMzNH0.2Lw2NdoyrL-9bnfJdnyzr2AZGxoKq1v2UsqL57Q848Q
+
+@user2-auth-token =Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyNTMyOWEzZTIwNTE3YTE4ZTYzNDBkNiIsInVzZXJuYW1lIjoidXNlcjIiLCJlbWFpbCI6InVzZXIyQGdtYWlsLmNvbSIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2NDk2MTczMjYsImV4cCI6MTY0OTcwMzcyNn0.55b4NPpdfCcvOSaGBmB5zmdBgxeASrLWdyTxqwIs5JM
+
+###  Auth Requests
+POST http://localhost:3005/api/auth/signup
+Content-Type: application/json
+
+{
+    "username" : "user2",
+    "password" : "user2",
+    "email" : "user2@gmail.com"
+}
+
+###
+POST http://localhost:3005/api/auth/login
+Content-Type: application/json
+
+{
+    "username" : "user2",
+    "password" : "user2"
+}
+
+###
+GET http://localhost:3005/api/auth/login/success
+
+###
+GET http://localhost:3005/api/auth/login/unsuccess
+
+
+
+####  User Requests
+GET http://localhost:3005/api/user?latest=true
+Authorization: {{admin-auth-token}}
+
+### 
+GET http://localhost:3005/api/user/62530bf7ac2e52f5e4dfe235
+Authorization: {{admin-auth-token}}
+
+###
+PUT http://localhost:3005/api/user/625329a3e20517a18e6340d6
+Content-Type: application/json
+Authorization: {{user1-auth-token}}
+
+{
+    "password" : "user2"
+}
+
+###
+DELETE http://localhost:3005/api/user/62530bf7ac2e52f5e4dfe235
+Authorization: {{admin-auth-token}}
+
+### 
+GET http://localhost:3005/api/user/stats
+Authorization: {{admin-auth-token}}
+
+
+
+### Product Reqests
+POST http://localhost:3005/api/product
+Content-Type: application/json
+Authorization: {{admin-auth-token}}
+
+{
+    "name" : "Denims",
+    "description" : "Denim men",
+    "image" : "https://images.pexels.com/photos/1598507/pexels-photo-1598507.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+    "price" : "28.90",
+    "size": ["small" , "medium", "large"],
+    "color": [ "black" , "brown" , "blue" , "dark-blue"],
+    "categories": ["denim", "men", "trousers"]
+}
+
+###
+GET http://localhost:3005/api/product
+
+###
+GET http://localhost:3005/api/product?latest=true
+
+###
+GET http://localhost:3005/api/product?category=men
+
+###
+GET http://localhost:3005/api/product/6251daf4b14a15a2afa9eac8
+
+###
+DELETE http://localhost:3005/api/product/6251daf4b14a15a2afa9eac8
+Authorization: {{admin-auth-token}}
+
+###
+
+PUT http://localhost:3005/api/product/6251db9d49afddb7eb398fc7
+Content-Type: application/json
+Authorization: {{admin-auth-token}}
+
+{
+    "price" : 18
+}
+
+
+### Cart Reqests
+POST http://localhost:3005/api/cart
+Content-Type: application/json
+
+{
+   "userID": "624df60b0ab3ada14ece5451",
+    "products": [
+        { "productId": "6251daf4b14a15a2afa9eac8" , "quantity": 1 },
+        { "productId": "6251daf4b14a15a2afa9eac8" , "quantity": 2 }
+    ]
+}
+
+###
+GET http://localhost:3005/api/cart
+Authorization: {{admin-auth-token}}
+
+###
+GET http://localhost:3005/api/cart/624df60b0ab3ada14ece5451
+Authorization: {{admin-auth-token}}
+
+###
+DELETE http://localhost:3005/api/cart/6251fa51e99229d1782ffddf
+Authorization: {{admin-auth-token}}
+
+###
+
+PUT http://localhost:3005/api/cart/6251fa51e99229d1782ffddf
+Content-Type: application/json
+Authorization: {{admin-auth-token}}
+
+{
+   "userID": "624df60b0ab3ada14ece5451",
+    "products": [
+        { "productId": "6251daf4b14a15a2afa9eac8" , "quantity": 9 },
+        { "productId": "6251db9d49afddb7eb398fc7" , "quantity": 5 },
+        { "productId": "6251db9d49afddb7eb398fc7" , "quantity": 5 }
+    ]
+}
+
+
+### Order Reqests
+POST http://localhost:3005/api/order
+Content-Type: application/json
+
+{
+    "userID": "624df60b0ab3ada14ece5451",
+    "products": [
+        {   
+            "productId": "6251daf4b14a15a2afa9eac8",
+            "quantity": 9
+        }
+    ],
+    "amount": 99.99,
+    "useraddress" : "NO 7 Colombo"
+}
+
+###
+GET http://localhost:3005/api/order
+
+###
+GET http://localhost:3005/api/order/sales
+
+###
+GET http://localhost:3005/api/order/624df60b0ab3ada14ece5451
+
+###
+DELETE http://localhost:3005/api/order/625204eb71a820c606d32e1c
+
+###
+
+PUT http://localhost:3005/api/order/62520a12d3aa19b939746b0c
+Content-Type: application/json
+
+{
+    "userID": "624df60b0ab3ada14ece5451",
+    "products": [
+        {   
+            "productId": "6251daf4b14a15a2afa9eac8",
+            "quantity": 9
+        },
+        {   
+            "productId": "6251db9d49afddb7eb398fc7",
+            "quantity": 2
+        }
+    ],
+    "amount": 99.99,
+    "useraddress" : "NO 7 Colombo"
+}
