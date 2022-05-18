@@ -1,22 +1,23 @@
 import bcrypt from 'bcrypt';
 import { RequestHandler } from 'express';
 const User = require('../Schema/User');
+const Customer = require('../Schema/Customer');
 const jwt = require('jsonwebtoken');
 
 const signup : RequestHandler = async (req, res,) => {
-    const existingUser = await User.findOne({ email: req.body.email });
-    if (existingUser) {
+    const existingCustomer = await Customer.findOne({ email: req.body.email });
+    if (existingCustomer) {
         res.json({
             success: false,
             user: null,
             message: "User Already Exists"
         }).status(409)
     }
-    if (!existingUser) {
+    if (!existingCustomer) {
         try {
             const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-            const newUser = new User({
+            const newCustomer = new Customer({
                 firstname: req.body.firstname,
                 lastname : req.body.lastname,
                 username: req.body.username,
@@ -24,11 +25,11 @@ const signup : RequestHandler = async (req, res,) => {
                 email: req.body.email,
             })
 
-            const createdUser = await newUser.save();
-            if (createdUser) {
+            const createdCustomer = await newCustomer.save();
+            if (createdCustomer) {
                 res.json({
                     success: true,
-                    user: createdUser,
+                    user: createdCustomer,
                     message: "User is successfully created"
                 }).status(200);
             } else {
@@ -49,6 +50,62 @@ const signup : RequestHandler = async (req, res,) => {
 }
 
 const login : RequestHandler = async (req, res,) => {
+    const existingCustomer = await Customer.findOne({ email: req.body.email });
+    if (!existingCustomer) {
+        res.json({
+            success: false,
+            user: null,
+            message: "Check your email or Signup"
+        }).status(409)
+    }
+    if (existingCustomer) {
+        try {
+            const isPasswordCorrect = await bcrypt.compare(req.body.password, existingCustomer.password);
+
+            if (isPasswordCorrect) {
+
+                const accesToken = jwt.sign({
+                    id: existingCustomer.id,
+                    firstname: existingCustomer.firstname,
+                    lastname: existingCustomer.lastname,
+                    username: existingCustomer.username,
+                    email: existingCustomer.email,
+                    photo: existingCustomer.photo || "",
+                }, process.env.JWT, {
+                    expiresIn : "1d"
+                })
+
+                res.json({
+                    success: true,
+                    user: {
+                        id: existingCustomer.id,
+                        firstname: existingCustomer.firstname,
+                        lastname: existingCustomer.lastname,
+                        username: existingCustomer.username,
+                        email: existingCustomer.email,
+                        photo: existingCustomer.photo || "",
+                    },
+                    accesToken,
+                    message: "Login Successfulll"
+                }).status(200);
+            } else {
+                res.json({
+                    success: false,
+                    user: null,
+                    message: "Incorrect Password"
+                }).status(200);
+            }
+        } catch (e) {
+            res.json({
+                success: false,
+                user: null,
+                message : "Error while Login"
+            }).status(500);
+        }
+    }
+}
+
+const adminLogin : RequestHandler = async (req, res,) => {
     const existingUser = await User.findOne({ email: req.body.email });
     if (!existingUser) {
         res.json({
@@ -65,24 +122,28 @@ const login : RequestHandler = async (req, res,) => {
 
                 const accesToken = jwt.sign({
                     id: existingUser.id,
-                    firstname: existingUser.firstname,
-                    lastname: existingUser.lastname,
+                    fullname: existingUser.fullname,
                     username: existingUser.username,
                     email: existingUser.email,
-                    isAdmin : existingUser.isAdmin
+                    contactdetails: existingUser.contactdetails || "",
+                    location: existingUser.location || "",
+                    role: existingUser.role || "",
+                    photo: existingUser.photo || "",
                 }, process.env.JWT, {
-                    expiresIn : "1d"
+                    expiresIn : "5d"
                 })
 
                 res.json({
                     success: true,
                     user: {
                         id: existingUser.id,
-                        firstname: existingUser.firstname,
-                        lastname: existingUser.lastname,
+                        fullname: existingUser.fullname,
                         username: existingUser.username,
                         email: existingUser.email,
-                        isAdmin : existingUser.isAdmin
+                        contactdetails: existingUser.contactdetails || "",
+                        location: existingUser.location || "",
+                        role: existingUser.role || "",
+                        photo: existingUser.photo || "",
                     },
                     accesToken,
                     message: "Login Successfulll"
@@ -114,7 +175,8 @@ const Logout: RequestHandler = (req, res) => {
 module.exports = {
     signup,
     login,
-    Logout
+    Logout,
+    adminLogin
 }
 
 // TO BE Used in Future Developments
