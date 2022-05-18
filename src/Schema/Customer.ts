@@ -1,16 +1,14 @@
 import mongoose from "mongoose"
 
-const UserSchema = new mongoose.Schema(
+const CustomerSchema = new mongoose.Schema(
     {
+        firstname: { type: String, required: true },
+        lastname: { type: String, required: true },
         username: { type: String, required: true, unique: true },
-        fullname: { type: String, required: true },
         email: { type: String, required: true, unique: true },
         password: { type: String, required: true },
-        contactdetails: { type: String },
-        location: { type: String },
-        role: { type: String, required: true },
         photo: { type :String }
     }, { timestamps: true }
 );
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model("Customer", CustomerSchema);

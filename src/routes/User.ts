@@ -6,7 +6,7 @@ const router = express.Router()
 
 router.get("/", VerifyToken, VerifyAdmin, userControllers.getAllUsers);
 
-router.get("/stats", VerifyToken, VerifyAdmin, userControllers.userStats);
+router.post("/", VerifyToken, VerifyAdmin, userControllers.createUser);
 
 router.get('/:id', VerifyToken, VerifyAuthorization, userControllers.getUserById);
 

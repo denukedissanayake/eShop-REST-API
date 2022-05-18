@@ -28,6 +28,45 @@ const getUserById :RequestHandler = async (req, res) => {
     }
 }
 
+const createUser: RequestHandler = async (req, res) => {
+    if (req.body) {
+        try {
+            const retrivedUser = await User.findOne({ email: req.body.email });
+            if (retrivedUser) {
+                return res.json("User is already Available").status(409);
+            }
+            
+            const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+            const newUser = new User({
+                username: req.body.username,
+                fullname: req.body.fullname,
+                email: req.body.email,
+                password: hashedPassword,
+                contactdetails: req.body.contactdetails || "",
+                location: req.body.location || "",
+                role: req.body.role,
+            })
+
+            try {
+                const createdUser = await newUser.save();
+                if (createdUser) {
+                    res.json(createdUser).status(200);
+                } else {
+                    return res.json("user not created. Error while adding User").status(500);
+                }
+            } catch (e) {
+                return res.json("Error while adding User").status(500);
+            }
+
+        } catch (e) {
+            res.json("Error while adding user").status(500);
+        }
+    } else {
+        return res.json("No data is found").status(500);
+    }
+}
+
 const updateUser :RequestHandler = async (req, res) => {
     const userId = req.params.id
     if (!userId) {
@@ -59,37 +98,10 @@ const deleteUser :RequestHandler = async (req, res) => {
     }
 }
 
-const userStats: RequestHandler = async (req, res) => {
-    const date = new Date();
-    const lastYesr = new Date(date.setFullYear(date.getFullYear() - 1));
-
-    try {
-        const userData = await User.aggregate([
-            {
-                $match: { createdAt: {$gte : lastYesr} }
-            },
-            {
-                $project: {
-                    month : { $month : "$createdAt" }
-                }
-            },
-            {
-                $group: {
-                    _id: "$month", 
-                    total : {$sum : 1}
-                }
-            }
-        ]);
-        res.json(userData).status(200);
-    } catch (e) {
-        return res.json("Error while fetching stats").status(500);
-    }
-}
-
 module.exports = {
     getAllUsers,
     getUserById,
     updateUser,
     deleteUser,
-    userStats
+    createUser
 }
