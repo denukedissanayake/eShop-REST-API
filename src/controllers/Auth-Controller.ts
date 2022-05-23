@@ -110,8 +110,7 @@ const adminLogin : RequestHandler = async (req, res,) => {
     if (!existingUser) {
         res.json({
             success: false,
-            user: null,
-            message: "Check your email or Signup"
+            message: "Check your Email or Signup"
         }).status(409)
     }
     if (existingUser) {
@@ -122,7 +121,7 @@ const adminLogin : RequestHandler = async (req, res,) => {
 
                 const accesToken = jwt.sign({
                     id: existingUser.id,
-                    fullname: existingUser.fullname,
+                    name: existingUser.fullname,
                     username: existingUser.username,
                     email: existingUser.email,
                     contactdetails: existingUser.contactdetails || "",
@@ -135,30 +134,18 @@ const adminLogin : RequestHandler = async (req, res,) => {
 
                 res.json({
                     success: true,
-                    user: {
-                        id: existingUser.id,
-                        fullname: existingUser.fullname,
-                        username: existingUser.username,
-                        email: existingUser.email,
-                        contactdetails: existingUser.contactdetails || "",
-                        location: existingUser.location || "",
-                        role: existingUser.role || "",
-                        photo: existingUser.photo || "",
-                    },
                     accesToken,
                     message: "Login Successfulll"
                 }).status(200);
             } else {
                 res.json({
                     success: false,
-                    user: null,
                     message: "Incorrect Password"
                 }).status(200);
             }
         } catch (e) {
             res.json({
                 success: false,
-                user: null,
                 message : "Error while Login"
             }).status(500);
         }

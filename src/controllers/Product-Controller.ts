@@ -2,13 +2,14 @@ import { RequestHandler } from "express";
 const Product = require('../Schema/Product');
 
 const createProduct: RequestHandler = async (req, res) => {
+
     const newProduct = new Product(req.body);
 
     try {
         const createdProduct = await newProduct.save();
         return res.json(createdProduct).status(200);
     } catch (e) {
-        return res.json("Product creating faild").status(500);
+        return res.json(`Product creating faild - ${e}`).status(500);
     }
 } 
 

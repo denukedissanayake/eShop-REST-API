@@ -9,9 +9,10 @@ require('./utils/passport');
 const AuthRouter = require('./routes/Auth');
 const UserRouter = require('./routes/User')
 const ProductRouter = require('./routes/Product')
-const CartController = require('./routes/Cart');
-const OrderController = require('./routes/Order');
-const PaymnetController = require('./routes/Payments');
+const CartRouter = require('./routes/Cart');
+const OrderRouter = require('./routes/Order');
+const PaymnetRouter = require('./routes/Payments');
+const CustomerRouter = require('./routes/Customer')
 
 const app = express();
 const PORT = 3006;
@@ -34,9 +35,10 @@ app.use(cors({
 app.use('/api/auth', AuthRouter);
 app.use('/api/user', UserRouter);
 app.use('/api/product', ProductRouter);
-app.use('/api/cart', CartController);
-app.use('/api/order', OrderController);
-app.use('/api/payments', PaymnetController);
+app.use('/api/cart', CartRouter);
+app.use('/api/order', OrderRouter);
+app.use('/api/payments', PaymnetRouter);
+app.use('/api/customer', CustomerRouter);
 
 mongoose.connect(process.env.MONGODB_URL as string)
     .then(() => console.log("Connected to MongoDB"))
