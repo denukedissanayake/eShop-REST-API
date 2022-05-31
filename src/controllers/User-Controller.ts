@@ -16,7 +16,7 @@ const getAllUsers: RequestHandler = async (req, res) => {
 
 const getUserById :RequestHandler = async (req, res) => {
     const userId = req.params.id
-    console.log(userId)
+
     if (!userId) {
         return res.json("User not found").status(404);
     }
@@ -40,7 +40,7 @@ const createUser: RequestHandler = async (req, res) => {
 
             const newUser = new User({
                 username: req.body.username,
-                fullname: req.body.fullname,
+                name: req.body.name,
                 email: req.body.email,
                 password: hashedPassword,
                 contactdetails: req.body.contactdetails || "",
@@ -72,14 +72,40 @@ const updateUser :RequestHandler = async (req, res) => {
     if (!userId) {
         return res.json("User not found").status(404);
     }
-    if (req.body.password) {
-        req.body.password = await bcrypt.hash(req.body.password, 10);
+
+    if (req.body.newPassword) {
+        if (!req.body.oldPassword) {
+            return res.json("Please provide both New and Old Passwords").status(404);
+        }
+        try {
+            const retrivedUser = await User.findOne({ _id: userId });
+            const isPasswordCorrect = await bcrypt.compare(req.body.oldPassword, retrivedUser.password);
+            if (!isPasswordCorrect) {
+                return res.json("Old Password in not correct!!!").status(404);
+            }
+            const hashedPassword = await bcrypt.hash(req.body.newPassword, 10);
+            delete req.body.oldPassword
+            delete req.body.newPassword
+            req.body.password = hashedPassword
+        } catch (e) {
+            return res.json("Error while updating password").status(500);
+        }
     }
+
     try {
         const updatedUser = await User.findByIdAndUpdate(userId, {
             $set : req.body
         }, { new: true });
-        res.json(updatedUser).status(200);
+        res.json({
+            id: updatedUser.id,
+            name: updatedUser.name,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            contactdetails: updatedUser.contactdetails || "",
+            location: updatedUser.location || "",
+            role: updatedUser.role || "",
+            photo: updatedUser.photo || "",
+        }).status(200);
     } catch (e) {
         return res.json("Error while updating User").status(500);
     }

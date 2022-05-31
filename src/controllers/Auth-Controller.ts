@@ -121,7 +121,7 @@ const adminLogin : RequestHandler = async (req, res,) => {
 
                 const accesToken = jwt.sign({
                     id: existingUser.id,
-                    name: existingUser.fullname,
+                    name: existingUser.name,
                     username: existingUser.username,
                     email: existingUser.email,
                     contactdetails: existingUser.contactdetails || "",
