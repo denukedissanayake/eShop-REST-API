@@ -1,12 +1,12 @@
 import express from 'express';
 const orderControllers = require('../controllers/Orders-Controller');
-const { VerifyToken , VerifyAdmin , VerifyAuthorization } = require('../utils/auth-middlewares');
+const { VerifyToken , VerifyAdmin , VerifyAuthorization, VerifyAdminOrModerators } = require('../utils/auth-middlewares');
 
 const router = express.Router()
 
 router.post('/', VerifyToken, orderControllers.createOrder);
 
-router.get('/', VerifyToken, VerifyAdmin, orderControllers.getOrders);
+router.get('/', VerifyToken, VerifyAdminOrModerators, orderControllers.getOrders);
 
 router.get('/sales', VerifyToken, VerifyAdmin, orderControllers.getMonthlyIncome);
 
